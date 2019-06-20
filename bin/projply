@@ -2,6 +2,8 @@
 #
 # projply
 #
+# Copyright (c) 2018-2019 ALSENET SA
+#
 # Author(s):
 #
 #      Luc Deschenaux <luc.deschenaux@freesurf.ch>
@@ -19,37 +21,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-# Additional Terms:
-#
-#      You are required to preserve legal notices and author attributions in
-#      that material or in the Appropriate Legal Notices displayed by works
-#      containing it.
-#
-#      You are required to attribute the work as explained in the "Usage and
-#      Attribution" section of <http://doxel.org/license>.
-#/
 
-usage() {
-  cat << EOF
-NAME
-      $(basename $0)
-
-SYNOPSIS
-      $(basename $0) [-h|--help] 
-
-DESCRIPTION
-      Run projply in the projply docker container, mounting volumes
-      as required by the --innput and --output parameters
-
-EOF
-  exit 1
-}
-
-case "$1" in
-  -h|--help) usage ;;
-esac
-
-NAME=projply
+NAME=projply-$$
 IMAGE=projply:latest
 CMDLINE="projply"
 
@@ -60,6 +33,8 @@ while [ $# -gt 0 ] ; do
     *) CMDLINE="$CMDLINE $1" ; shift ;;
   esac
 done
+
+[ -z "$INPUT" -o -z "$OUTPUT" ] && exec docker run --name $NAME -i $IMAGE projply -h
 
 VOLUMES="-v $(dirname $INPUT):/tmp/input"
 if [ -n "$OUTPUT" ] ; then
